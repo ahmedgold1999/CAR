@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مولد لوحة السيارة</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      direction: rtl;
+      text-align: center;
+      background-color: #f8f8f8;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label, select, input {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    .plate {
+      margin-top: 20px;
+      border: 2px solid black;
+      border-radius: 5px;
+      background: #fff;
+      padding: 20px;
+      display: inline-block;
+      text-align: center;
+      font-family: 'Courier New', monospace;
+    }
+    .plate .top {
+      font-size: 32px;
+      display: flex;
+      justify-content: space-around;
+    }
+    .plate .bottom {
+      font-size: 40px;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    .plate .side {
+      writing-mode: vertical-rl;
+      font-size: 18px;
+      position: absolute;
+      left: 10px;
+      top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>مولد لوحة السيارة</h2>
+    <label for="number-select">اختيار الرقم (1-22)</label>
+    <select id="number-select"></select>
+
+    <label for="letter-select">اختيار الحرف</label>
+    <select id="letter-select"></select>
+
+    <label for="code-input">ادخال الرقم التسلسلي</label>
+    <input type="text" id="code-input" placeholder="مثال: 68810">
+
+    <button onclick="generatePlate()">إنشاء اللوحة</button>
+    <div id="plate-frame"></div>
+    <button onclick="printPlate()">طباعة اللوحة</button>
+  </div>
+
+  <script>
+    const numberSelect = document.getElementById('number-select');
+    const letterSelect = document.getElementById('letter-select');
+
+    // تعبئة القوائم
+    for (let i = 1; i <= 22; i++) {
+      const option = document.createElement('option');
+      option.value = i;
+      option.textContent = i;
+      numberSelect.appendChild(option);
+    }
+
+    for (let i = 65; i <= 90; i++) {
+      const letter = String.fromCharCode(i);
+      const option = document.createElement('option');
+      option.value = letter;
+      option.textContent = letter;
+      letterSelect.appendChild(option);
+    }
+
+    function generatePlate() {
+      const number = numberSelect.value;
+      const letter = letterSelect.value;
+      const code = document.getElementById('code-input').value;
+
+      if (!code || isNaN(code)) {
+        alert('يرجى إدخال رقم تسلسلي صحيح');
+        return;
+      }
+
+      const plateHTML = `
+        <div class="plate" id="printable">
+          <div class="side">
+            IRQ<br>KR
+          </div>
+          <div class="top">
+            <div>${number}</div>
+            <div>${letter}</div>
+          </div>
+          <div class="bottom">${code}</div>
+        </div>
+      `;
+
+      document.getElementById('plate-frame').innerHTML = plateHTML;
+    }
+
+    function printPlate() {
+      const plate = document.getElementById('printable');
+      if (!plate) return;
+
+      const win = window.open('', '', 'width=400,height=400');
+      win.document.write(`
+        <html>
+          <head>
+            <title>طباعة اللوحة</title>
+            <style>
+              body { text-align: center; font-family: Arial; }
+              .plate { border: 2px solid black; padding: 20px; display: inline-block; font-family: 'Courier New'; }
+              .top { font-size: 32px; display: flex; justify-content: space-around; }
+              .bottom { font-size: 40px; margin-top: 10px; font-weight: bold; }
+              .side { writing-mode: vertical-rl; font-size: 18px; position: absolute; left: 10px; top: 10px; }
+            </style>
+          </head>
+          <body>
+            ${plate.outerHTML}
+            <script>window.print();<\/script>
+          </body>
+        </html>
+      `);
+      win.document.close();
+    }
+  </script>
+</body>
+</html>
